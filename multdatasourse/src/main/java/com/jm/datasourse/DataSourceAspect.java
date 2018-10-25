@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository;
 @Aspect
 @Repository
 public class DataSourceAspect {
-    //切点表示com.jm.service.impl.UserServiceImpl下的所有方法
+    //标记哪些方法不使用默认数据源，需要重新设置数据源
+    //切点表示com.jm.service.impl.UserServiceImpl下 以2结尾的所有方法
     @Pointcut("execution(* com.jm.service.impl.*ServiceImpl.*2(..))")
     private void anyMethod() {
     }
@@ -29,8 +30,7 @@ public class DataSourceAspect {
     @Before(value = "anyMethod()")
     public void before(JoinPoint joinPoint) throws Throwable {
         System.out.println("方法进入切面.....");
-        //如果方法体上使用了DataSource注解
+        //如果重新设置数据源
         DataSourceHolder.setDataSourceType("ds2");
     }
-
 }
