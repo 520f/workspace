@@ -36,7 +36,7 @@ public class UserController {
     @ResponseBody
     public Object testExceptExcel(){
         //绝对路径（将项目下的文件复制到任意目录）
-        String filePath="D:\\学生信息.xlsx";
+        String filePath="C:\\学生信息.xlsx";
         // 创建excel工具类
         ExcelUtil<DUser> util = new ExcelUtil<>(DUser.class);
         List<DUser> userList = null;
@@ -66,7 +66,7 @@ public class UserController {
         util.webOutputExcel(list,response,Math.random()+".xlsx");
         try {
             //写入到本地硬盘(内部自动关流)
-            util.exportExcel(list,"学生信息sheet",new FileOutputStream("D:\\1.xlsx"));
+            util.exportExcel(list,"学生信息sheet",new FileOutputStream("C:\\1.xlsx"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
