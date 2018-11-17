@@ -8,8 +8,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -23,37 +25,50 @@ public class UserController {
     private Logger logger = Logger.getLogger(UserController.class);
     @Autowired
     private UserService userServiceImpl;
-    @RequestMapping("/list")
-    public Object list(HttpServletResponse  response){
-        List list= userServiceImpl.getUserList();
-        System.out.println(list);
-        testExceptExcel(list,response);
-        //相对路径
-        String filePath="学生信息.xls";
-        testInputExcel(filePath);
-        return list;
-    }
 
     /**
-     *         导入测试
-     * @param filePath  文件路径（相对路径，绝对路径都可以）
+     * 测试url：http://localhost:8080/testImportExcel
+     *
+     * 测试导入
+     * @return
      */
-    private void testInputExcel(String filePath) {
+    @RequestMapping("/testImportExcel")
+    @ResponseBody
+    public Object testExceptExcel(){
+        //绝对路径（将项目下的文件复制到任意目录）
+        String filePath="D:\\学生信息.xlsx";
         // 创建excel工具类
         ExcelUtil<DUser> util = new ExcelUtil<>(DUser.class);
-        List<DUser> userList = util.importExcel(filePath);
+        List<DUser> userList = null;
+        try {
+            //传入参数是一个FileInputStream对象，FileInputStream可以直接加载文件获取，
+            // 也可以通过web表单获取（本次测试是加载的项目下的文件）
+            userList = util.importExcel(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //输出表格中数据
         System.out.println("userList:"+userList);
+        return userList;
     }
-
     /**
+     *  测试url：http://localhost:8080/testImportExcel
      *     导出测试
-     * @param list
      * @param response
      */
-    private void testExceptExcel(List list, HttpServletResponse response){
+    @RequestMapping("/testExceptExcel")
+    private void testExceptExcel(HttpServletResponse response){
         // 创建excel工具类
         ExcelUtil<DUser> util = new ExcelUtil<>(DUser.class);
-        util.webOutputExcel(list,"学生信息",response,Math.random()+".xlsx");
+        //从数据库获取数据
+        List list = userServiceImpl.getUserList();
+        //写入到web的响应流中
+        util.webOutputExcel(list,response,Math.random()+".xlsx");
+        try {
+            //写入到本地硬盘(内部自动关流)
+            util.exportExcel(list,"学生信息sheet",new FileOutputStream("D:\\1.xlsx"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
