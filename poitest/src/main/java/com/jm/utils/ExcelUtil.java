@@ -107,7 +107,7 @@ public class ExcelUtil<T> {
                     // int cellNum = row.getLastCellNum();
                     int cellNum = maxCol;
                     T entity = null;
-                    for (int j = 0; j < cellNum; j++) {
+                    for (int j = 0; j <=cellNum; j++) {
                         HSSFCell cell = row.getCell(j);
                         if (cell == null) {
                             continue;
